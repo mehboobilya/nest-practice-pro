@@ -36,17 +36,17 @@ export class AuthService {
       password: hashPassword,
     });
   }
-  async userLogin(email ,password) {
+  async userLogin(email, password) {
     // let { email, password } = loginCredentialsDto;
     const user = await this.userModal.findOne({ email: email.toLowerCase() });
     if (user && (await bcrypt.compare(password, user.password))) {
       const accessToken: string = await this.getJwtToken(user);
       return {
-        status: "success",
+        status: 'success',
         data: {
           accessToken,
-          user
-        }
+          user,
+        },
       };
     } else {
       return null;
@@ -55,12 +55,16 @@ export class AuthService {
 
   async getJwtToken(user: any, is2FaAuthenticated = false) {
     // console.log("user::::", user);
-    
+
     const payload: any = {
       userId: user.id,
       name: user.name,
       email: user.email,
     };
     return this.jwtService.sign(payload);
+  }
+
+  async findUser(userId: string) {
+    return await this.userModal.findOne({ _id: userId });
   }
 }

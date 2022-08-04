@@ -6,17 +6,27 @@ import {
   Param,
   Patch,
   Delete,
+  UseGuards,
+  Req,
 } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { JwtAuthGuard } from 'src/auth/gaurd/jwt-auth.guard';
 import { Product } from 'src/database/entities/product.schema';
 import { productDto } from './dto/productDto';
 import { ProductsService } from './products.service';
 
+@ApiBearerAuth()
+@ApiTags('Product')
 @Controller('products')
 export class ProducsController {
   constructor(private readonly ProductsService: ProductsService) {}
+  @UseGuards(JwtAuthGuard)
   @Post()
-  async addproducts(@Body() productDto: productDto) {
-    const genratedId = await this.ProductsService.insertProduct(productDto);
+  async addproducts(@Body() productDto: productDto, @Req() { user }) {
+    const genratedId = await this.ProductsService.insertProduct(
+      productDto,
+      user,
+    );
     return genratedId;
   }
   @Get()

@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { User } from 'src/database/entities/auth.schema';
 import { Product, ProductDocument } from 'src/database/entities/product.schema';
 @Injectable()
 export class ProductsService {
@@ -9,8 +10,11 @@ export class ProductsService {
     private readonly productModal: Model<ProductDocument>,
   ) {}
 
-  async insertProduct(productDto) {
-    return await this.productModal.create(productDto);
+  async insertProduct(productDto, user: User) {
+    return await this.productModal.create({
+      ...productDto,
+      user: user._id,
+    });
   }
 
   async fetchProducts() {
