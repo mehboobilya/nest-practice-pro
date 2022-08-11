@@ -10,15 +10,17 @@ export class ProductsService {
     private readonly productModal: Model<ProductDocument>,
   ) {}
 
-  async insertProduct(productDto, user: User) {
+  async insertProduct(productDto, user: { userId: string }) {
+    console.log('user-----------', user);
+
     return await this.productModal.create({
       ...productDto,
-      user: user._id,
+      user: user.userId,
     });
   }
 
-  async fetchProducts() {
-    const result = await this.productModal.find();
+  async fetchProducts(user: { userId: string }) {
+    const result = await this.productModal.find({ user: user.userId });
     return result;
   }
 

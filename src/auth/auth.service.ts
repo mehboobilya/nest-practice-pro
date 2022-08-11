@@ -58,8 +58,8 @@ export class AuthService {
 
     const payload: any = {
       userId: user.id,
-      name: user.name,
-      email: user.email,
+      // name: user.name,
+      // email: user.email,
     };
     return this.jwtService.sign(payload);
   }
