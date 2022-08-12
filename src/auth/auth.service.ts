@@ -1,4 +1,5 @@
 import {
+  ForbiddenException,
   HttpException,
   HttpStatus,
   Injectable,
@@ -50,6 +51,47 @@ export class AuthService {
       };
     } else {
       return null;
+    }
+  }
+
+  async changePassword(
+    newPassword: string,
+    oldPassword: string,
+    userID: string,
+  ) {
+    try {
+      /* find user */
+      const findUser = await this.userModal.findById(userID);
+      if (!findUser) throw new NotFoundException({ message: 'user not found' });
+
+      /** match password */
+
+      const verified = await bcrypt.compareSync(oldPassword, findUser.password);
+      if (!verified)
+        throw new ForbiddenException({ message: "password didn't match" });
+
+      const hashPassword = bcrypt.hashSync(newPassword, 8);
+
+      const _user = this.userModal.findByIdAndUpdate(
+        { _id: userID },
+        {
+          password: hashPassword,
+        },
+      );
+
+      return 'Password change successfully';
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async forgetPassword(ForgotPasswordDto) {
+    const { email } = ForgotPasswordDto;
+    const user = await this.userModal.findOne({ email });
+    console.log('email---------', user);
+
+    if (!user) {
+      throw new NotFoundException('User with the given email not found');
     }
   }
 
