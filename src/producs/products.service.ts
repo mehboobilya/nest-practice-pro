@@ -11,10 +11,14 @@ export class ProductsService {
   ) {}
 
   async insertProduct(productDto, user: User) {
-    return await this.productModal.create({
+    console.log("user recieve>>>>", user);
+
+    const productInfo = await this.productModal.create({
       ...productDto,
       user: user._id,
     });
+
+    return productInfo;
   }
 
   async fetchProducts() {

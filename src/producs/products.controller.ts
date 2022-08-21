@@ -23,6 +23,7 @@ export class ProducsController {
   @UseGuards(JwtAuthGuard)
   @Post()
   async addproducts(@Body() productDto: productDto, @Req() { user }) {
+    
     const genratedId = await this.ProductsService.insertProduct(
       productDto,
       user,
