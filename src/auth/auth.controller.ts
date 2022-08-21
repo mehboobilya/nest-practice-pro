@@ -1,9 +1,12 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Post, UseGuards, Req } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
+import { ChangePasswordDto } from './dto/auth-changePassword.dto';
+import { ForgotPasswordDto } from './dto/auth-forgetPassword.dto';
 import { LoginCredentialsDto } from './dto/auth-login.dto';
 import { AuthCredentialsDto } from './dto/auth-register.dto';
+import { JwtAuthGuard } from './gaurd/jwt-auth.guard';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -20,5 +23,25 @@ export class AuthController {
       loginCredentialsDto.email,
       loginCredentialsDto.password,
     );
+  }
+  // @ApiBearerAuth()
+  // @UseGuards(AuthGuard('local'))
+  @UseGuards(JwtAuthGuard)
+  @Post('change-password')
+  async changePassword(
+    @Body() ChangePasswordDto: ChangePasswordDto,
+    @Req() { user },
+  ) {
+    console.log('user fffff', user);
+
+    return this.authService.changePassword(
+      ChangePasswordDto.newPassword,
+      ChangePasswordDto.oldPassword,
+      user.userId,
+    );
+  }
+  @Post('forget-password')
+  async forgetPassword(@Body() ForgotPasswordDto: ForgotPasswordDto) {
+    return await this.authService.forgetPassword(ForgotPasswordDto);
   }
 }

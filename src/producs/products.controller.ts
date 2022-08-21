@@ -30,9 +30,10 @@ export class ProducsController {
     );
     return genratedId;
   }
+  @UseGuards(JwtAuthGuard)
   @Get()
-  async getAllProduct() {
-    return await this.ProductsService.fetchProducts();
+  async getAllProduct(@Req() { user }) {
+    return await this.ProductsService.fetchProducts(user);
   }
 
   @Get(':id')
