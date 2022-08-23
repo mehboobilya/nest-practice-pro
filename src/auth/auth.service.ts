@@ -13,6 +13,8 @@ import { User, userDocument } from 'src/database/entities/auth.schema';
 import * as bcrypt from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
 import { LoginCredentialsDto } from './dto/auth-login.dto';
+import { ConfigService } from '@nestjs/config';
+import { EmailHandlerService } from 'src/email-handler/email-handler.service';
 
 @Injectable()
 export class AuthService {
@@ -20,6 +22,10 @@ export class AuthService {
     @InjectModel(User.name)
     private readonly userModal: Model<userDocument>,
     private readonly jwtService: JwtService,
+    private readonly configService: ConfigService,
+    private readonly emailService: EmailHandlerService,
+
+
   ) {}
   async interNEwUser(AuthCredentialsDto) {
     // let foundExistingEmail = this.userModal.findOne({
@@ -86,13 +92,40 @@ export class AuthService {
   }
 
   async forgetPassword(ForgotPasswordDto) {
-    const { email } = ForgotPasswordDto;
-    const user = await this.userModal.findOne({ email });
-    console.log('email---------', user);
-
-    if (!user) {
-      throw new NotFoundException('User with the given email not found');
+    try {
+      const { email } = ForgotPasswordDto;
+      const user = await this.userModal.findOne({ email });
+      console.log('email---------', user);
+  
+      if (!user) {
+        throw new NotFoundException('User with the given email not found');
+      }
+  
+      let code = Math.floor(1000 + Math.random() * 9000);
+      console.log(
+        '🚀 ~ file: auth.service.ts ~ line 179 ~ AuthService ~ forgotPassword ~ code',
+        code,
+      );
+      const mail = {
+        to: email,
+        subject: 'Password Reset Email',
+        from: this.configService.get('FROM_EMAIL'),
+        text: `Your password reset code is ${code}. Please do not share this with anyone.`,
+      };
+  
+      await this.emailService.sendEmail(mail);
+  
+      return {
+        message: 'Password reset email has been sent successfully!',
+      };
+    } catch (error) {
+      console.log(
+        '🚀 ~ file: auth.service.ts ~ line 198 ~ AuthService ~ forgotPassword ~ err',
+        error,
+      );
     }
+   
+
   }
 
   async getJwtToken(user: any, is2FaAuthenticated = false) {

@@ -21,7 +21,7 @@ export class ProductsService {
     return productInfo;
   }
 
-  async fetchProducts() {
+  async fetchProducts(user) {
     const result = await this.productModal.find();
     return result;
   }
