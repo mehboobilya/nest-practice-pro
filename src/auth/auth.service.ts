@@ -94,12 +94,12 @@ export class AuthService {
   async forgetPassword(ForgotPasswordDto) {
     try {
       const { email } = ForgotPasswordDto;
-      const user = await this.userModal.findOne({ email });
-      console.log('email---------', user);
+      // const user = await this.userModal.findOne({ email });
+      // console.log('email---------', user);
   
-      if (!user) {
-        throw new NotFoundException('User with the given email not found');
-      }
+      // if (!user) {
+      //   throw new NotFoundException('User with the given email not found');
+      // }
   
       let code = Math.floor(1000 + Math.random() * 9000);
       console.log(
@@ -109,7 +109,7 @@ export class AuthService {
       const mail = {
         to: email,
         subject: 'Password Reset Email',
-        from: this.configService.get('FROM_EMAIL'),
+        from: "test@yopmail.com",
         text: `Your password reset code is ${code}. Please do not share this with anyone.`,
       };
   
@@ -142,4 +142,5 @@ export class AuthService {
   async findUser(userId: string) {
     return await this.userModal.findOne({ _id: userId });
   }
+
 }
